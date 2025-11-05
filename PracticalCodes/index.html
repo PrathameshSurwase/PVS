@@ -78,3 +78,355 @@ public class pizza {
         tspSolver.findOptimalRoute(g, startLocation);
     }
 }
+
+
+
+
+
+
+
+
+
+                
+
+
+
+class CityBST {
+
+    static class Node {
+        String cityName;
+        int population;
+        Node left, right;
+
+        Node(String cityName, int population) {
+            this.cityName = cityName;
+            this.population = population;
+        }
+    }
+
+    static class BST {
+        Node root;
+
+        // Add a new city
+        void addCity(String cityName, int population) {
+            root = insert(root, cityName, population);
+        }
+
+        private Node insert(Node node, String cityName, int population) {
+            if (node == null) return new Node(cityName, population);
+            if (cityName.compareTo(node.cityName) < 0)
+                node.left = insert(node.left, cityName, population);
+            else if (cityName.compareTo(node.cityName) > 0)
+                node.right = insert(node.right, cityName, population);
+            else
+                System.out.println("City already exists.");
+            return node;
+        }
+
+        // Delete a city
+        void deleteCity(String cityName) {
+            root = delete(root, cityName);
+        }
+
+        private Node delete(Node node, String cityName) {
+            if (node == null) return null;
+            if (cityName.compareTo(node.cityName) < 0)
+                node.left = delete(node.left, cityName);
+            else if (cityName.compareTo(node.cityName) > 0)
+                node.right = delete(node.right, cityName);
+            else {
+                if (node.left == null) return node.right;
+                if (node.right == null) return node.left;
+                Node successor = findMin(node.right);
+                node.cityName = successor.cityName;
+                node.population = successor.population;
+                node.right = delete(node.right, successor.cityName);
+            }
+            return node;
+        }
+
+        private Node findMin(Node node) {
+            while (node.left != null) node = node.left;
+            return node;
+        }
+
+        // Update population
+        void updatePopulation(String cityName, int newPopulation) {
+            Node node = search(root, cityName);
+            if (node != null) {
+                node.population = newPopulation;
+                System.out.println("Population updated for " + cityName);
+            } else {
+                System.out.println("City not found.");
+            }
+        }
+
+        private Node search(Node node, String cityName) {
+            if (node == null) return null;
+            if (cityName.equals(node.cityName)) return node;
+            if (cityName.compareTo(node.cityName) < 0)
+                return search(node.left, cityName);
+            else
+                return search(node.right, cityName);
+        }
+
+        // Search city and count comparisons
+        int searchCity(String cityName) {
+            return searchComparisons(root, cityName, 0);
+        }
+
+        private int searchComparisons(Node node, String cityName, int comparisons) {
+            if (node == null) return comparisons;
+            comparisons++;
+            if (cityName.equals(node.cityName)) return comparisons;
+            if (cityName.compareTo(node.cityName) < 0)
+                return searchComparisons(node.left, cityName, comparisons);
+            else
+                return searchComparisons(node.right, cityName, comparisons);
+        }
+
+        // Display cities in ascending order
+        void displayAscending() {
+            if (root == null) {
+                System.out.println("No cities to display.");
+                return;
+            }
+            System.out.println("Cities in Ascending Order:");
+            inorder(root);
+        }
+
+        private void inorder(Node node) {
+            if (node != null) {
+                inorder(node.left);
+                System.out.println(node.cityName + " - Population: " + node.population);
+                inorder(node.right);
+            }
+        }
+
+        // Display cities in descending order
+        void displayDescending() {
+            if (root == null) {
+                System.out.println("No cities to display.");
+                return;
+            }
+            System.out.println("Cities in Descending Order:");
+            reverseInorder(root);
+        }
+
+        private void reverseInorder(Node node) {
+            if (node != null) {
+                reverseInorder(node.right);
+                System.out.println(node.cityName + " - Population: " + node.population);
+                reverseInorder(node.left);
+            }
+        }
+
+        // Maximum comparisons (height of tree)
+        int maxComparisons() {
+            return height(root);
+        }
+
+        private int height(Node node) {
+            if (node == null) return 0;
+            return 1 + Math.max(height(node.left), height(node.right));
+        }
+    }
+
+    public static void main(String[] args) {
+        BST tree = new BST();
+
+        tree.addCity("Mumbai", 20411000);
+        tree.addCity("Delhi", 16787941);
+        tree.addCity("Bangalore", 8443675);
+        tree.addCity("Chennai", 7088000);
+        tree.addCity("Hyderabad", 6809970);
+
+        tree.displayAscending();
+        tree.displayDescending();
+
+        tree.updatePopulation("Delhi", 18000000);
+        tree.deleteCity("Chennai");
+
+        System.out.println("Comparisons to find 'Hyderabad': " + tree.searchCity("Hyderabad"));
+        System.out.println("Maximum comparisons in worst case: " + tree.maxComparisons());
+    }
+}
+
+
+
+
+
+
+
+import java.util.Scanner;
+
+class StudentRecordSystem {
+
+    static class Student {
+        int rollNo;
+        String name;
+        int marks;
+        Student prev, next;
+
+        Student(int rollNo, String name, int marks) {
+            this.rollNo = rollNo;
+            this.name = name;
+            this.marks = marks;
+        }
+    }
+
+    static class DoublyLinkedList {
+        Student head, tail;
+
+        // Add student
+        void addStudent(int rollNo, String name, int marks) {
+            Student newStudent = new Student(rollNo, name, marks);
+            if (head == null) {
+                head = tail = newStudent;
+            } else {
+                tail.next = newStudent;
+                newStudent.prev = tail;
+                tail = newStudent;
+            }
+            System.out.println("Student added.");
+        }
+
+        // Delete student by roll number
+        void deleteStudent(int rollNo) {
+            Student current = head;
+            while (current != null) {
+                if (current.rollNo == rollNo) {
+                    if (current == head) head = current.next;
+                    if (current == tail) tail = current.prev;
+                    if (current.prev != null) current.prev.next = current.next;
+                    if (current.next != null) current.next.prev = current.prev;
+                    System.out.println("Student deleted.");
+                    return;
+                }
+                current = current.next;
+            }
+            System.out.println("Student not found.");
+        }
+
+        // Update student marks
+        void updateMarks(int rollNo, int newMarks) {
+            Student current = head;
+            while (current != null) {
+                if (current.rollNo == rollNo) {
+                    current.marks = newMarks;
+                    System.out.println("Marks updated.");
+                    return;
+                }
+                current = current.next;
+            }
+            System.out.println("Student not found.");
+        }
+
+        // Search student
+        void searchStudent(int rollNo) {
+            Student current = head;
+            while (current != null) {
+                if (current.rollNo == rollNo) {
+                    System.out.println("Found: RollNo=" + current.rollNo + ", Name=" + current.name + ", Marks=" + current.marks);
+                    return;
+                }
+                current = current.next;
+            }
+            System.out.println("Student not found.");
+        }
+
+        // Sort by roll number or marks
+        void sortRecords(String criteria, boolean ascending) {
+            if (head == null || head.next == null) return;
+
+            for (Student i = head; i != null; i = i.next) {
+                for (Student j = i.next; j != null; j = j.next) {
+                    boolean condition = false;
+                    if (criteria.equals("roll")) {
+                        condition = ascending ? i.rollNo > j.rollNo : i.rollNo < j.rollNo;
+                    } else if (criteria.equals("marks")) {
+                        condition = ascending ? i.marks > j.marks : i.marks < j.marks;
+                    }
+
+                    if (condition) {
+                        // Swap data
+                        int tempRoll = i.rollNo;
+                        String tempName = i.name;
+                        int tempMarks = i.marks;
+
+                        i.rollNo = j.rollNo;
+                        i.name = j.name;
+                        i.marks = j.marks;
+
+                        j.rollNo = tempRoll;
+                        j.name = tempName;
+                        j.marks = tempMarks;
+                    }
+                }
+            }
+            System.out.println("Records sorted by " + criteria + " in " + (ascending ? "ascending" : "descending") + " order.");
+        }
+
+        // Display records
+        void displayRecords() {
+            if (head == null) {
+                System.out.println("No records to display.");
+                return;
+            }
+            Student current = head;
+            System.out.println("Student Records:");
+            while (current != null) {
+                System.out.println("RollNo: " + current.rollNo + ", Name: " + current.name + ", Marks: " + current.marks);
+                current = current.next;
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        DoublyLinkedList list = new DoublyLinkedList();
+        Scanner sc = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("\n1.Add 2.Delete 3.Update 4.Search 5.Sort 6.Display 7.Exit");
+            int choice = sc.nextInt();
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter RollNo, Name, Marks: ");
+                    int r = sc.nextInt();
+                    String n = sc.next();
+                    int m = sc.nextInt();
+                    list.addStudent(r, n, m);
+                    break;
+                case 2:
+                    System.out.print("Enter RollNo to delete: ");
+                    list.deleteStudent(sc.nextInt());
+                    break;
+                case 3:
+                    System.out.print("Enter RollNo and new Marks: ");
+                    list.updateMarks(sc.nextInt(), sc.nextInt());
+                    break;
+                case 4:
+                    System.out.print("Enter RollNo to search: ");
+                    list.searchStudent(sc.nextInt());
+                    break;
+                case 5:
+                    System.out.print("Sort by 'roll' or 'marks'? ");
+                    String crit = sc.next();
+                    System.out.print("Ascending (true) or Descending (false)? ");
+                    boolean asc = sc.nextBoolean();
+                    list.sortRecords(crit, asc);
+                    break;
+                case 6:
+                    list.displayRecords();
+                    break;
+                case 7:
+                    System.out.println("Exiting...");
+                    return;
+            }
+        }
+    }
+}
+
+
+
+                
