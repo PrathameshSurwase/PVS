@@ -1,54 +1,69 @@
+import java.util.*;
 
-        import java.util.*;
+public class pizza {
 
-class PizzaDelivery {
     static class Graph {
         int V;
         int[][] adjMatrix;
-        
+
         Graph(int V) {
             this.V = V;
             adjMatrix = new int[V][V];
-            for(int i=0;i<V;i++)
+            for (int i = 0; i < V; i++)
                 Arrays.fill(adjMatrix[i], Integer.MAX_VALUE);
         }
-        
+
         void addEdge(int u, int v, int time) {
             adjMatrix[u][v] = time;
-            adjMatrix[v][u] = time; // undirected graph
+            adjMatrix[v][u] = time; // undirected
         }
     }
-    
-    static void deliverPizza(Graph g, int start) {
-        boolean[] visited = new boolean[g.V];
-        int current = start;
-        visited[current] = true;
-        int totalTime = 0;
-        System.out.print("Delivery route: " + current);
-        
-        for(int count=1; count < g.V; count++) {
-            int next = -1;
-            int minTime = Integer.MAX_VALUE;
-            
-            for(int i=0; i<g.V; i++) {
-                if(!visited[i] && g.adjMatrix[current][i] < minTime) {
-                    minTime = g.adjMatrix[current][i];
-                    next = i;
+
+    static class TSP {
+        int minTime = Integer.MAX_VALUE;
+        List<Integer> bestRoute = new ArrayList<>();
+
+        void tspUtil(Graph g, int current, boolean[] visited, List<Integer> route, int timeSoFar, int start) {
+            if (route.size() == g.V) {
+                if (g.adjMatrix[current][start] != Integer.MAX_VALUE) {
+                    int totalTime = timeSoFar + g.adjMatrix[current][start];
+                    if (totalTime < minTime) {
+                        minTime = totalTime;
+                        bestRoute = new ArrayList<>(route);
+                        bestRoute.add(start); // return to start
+                    }
+                }
+                return;
+            }
+
+            for (int i = 0; i < g.V; i++) {
+                if (!visited[i] && g.adjMatrix[current][i] != Integer.MAX_VALUE) {
+                    visited[i] = true;
+                    route.add(i);
+                    tspUtil(g, i, visited, route, timeSoFar + g.adjMatrix[current][i], start);
+                    visited[i] = false;
+                    route.remove(route.size() - 1);
                 }
             }
-            
-            visited[next] = true;
-            totalTime += minTime;
-            current = next;
-            System.out.print(" -> " + current);
         }
-        
-        System.out.println("\nTotal delivery time: " + totalTime);
+
+        void findOptimalRoute(Graph g, int start) {
+            boolean[] visited = new boolean[g.V];
+            visited[start] = true;
+            List<Integer> route = new ArrayList<>();
+            route.add(start);
+            tspUtil(g, start, visited, route, 0, start);
+
+            System.out.print("Optimal delivery route: ");
+            for (int loc : bestRoute)
+                System.out.print(loc + " -> ");
+            System.out.println("END");
+            System.out.println("Minimum delivery time: " + minTime + " minutes");
+        }
     }
-    
+
     public static void main(String[] args) {
         Graph g = new Graph(5);
-        
         g.addEdge(0, 1, 10);
         g.addEdge(0, 2, 15);
         g.addEdge(0, 3, 20);
@@ -57,419 +72,9 @@ class PizzaDelivery {
         g.addEdge(2, 3, 30);
         g.addEdge(1, 4, 30);
         g.addEdge(3, 4, 15);
-        
+
         int startLocation = 0;
-        deliverPizza(g, startLocation);
-    }
-
-
-
-
-
-
-
-
-    import java.util.Scanner;
-
-class Student {
-    int rollNo;
-    String name;
-    float marks;
-    Student next;
-
-    Student(int rollNo, String name, float marks) {
-        this.rollNo = rollNo;
-        this.name = name;
-        this.marks = marks;
-        this.next = null;
+        TSP tspSolver = new TSP();
+        tspSolver.findOptimalRoute(g, startLocation);
     }
 }
-
-class StudentManagement {
-    Student head = null;
-
-    // Add student at end
-    void addStudent(int rollNo, String name, float marks) {
-        Student newStudent = new Student(rollNo, name, marks);
-        if (head == null) {
-            head = newStudent;
-        } else {
-            Student temp = head;
-            while (temp.next != null)
-                temp = temp.next;
-            temp.next = newStudent;
-        }
-        System.out.println("Student added successfully!");
-    }
-
-    // Delete student by Roll No
-    void deleteStudent(int rollNo) {
-        if (head == null) {
-            System.out.println("List is empty!");
-            return;
-        }
-
-        if (head.rollNo == rollNo) {
-            head = head.next;
-            System.out.println("Student deleted successfully!");
-            return;
-        }
-
-        Student temp = head;
-        while (temp.next != null && temp.next.rollNo != rollNo)
-            temp = temp.next;
-
-        if (temp.next == null) {
-            System.out.println("Student not found!");
-        } else {
-            temp.next = temp.next.next;
-            System.out.println("Student deleted successfully!");
-        }
-    }
-
-    // Update student details
-    void updateStudent(int rollNo, String name, float marks) {
-        Student temp = head;
-        while (temp != null && temp.rollNo != rollNo)
-            temp = temp.next;
-
-        if (temp == null) {
-            System.out.println("Student not found!");
-        } else {
-            temp.name = name;
-            temp.marks = marks;
-            System.out.println("Student updated successfully!");
-        }
-    }
-
-    // Search student by Roll No
-    void searchStudent(int rollNo) {
-        Student temp = head;
-        while (temp != null && temp.rollNo != rollNo)
-            temp = temp.next;
-
-        if (temp == null) {
-            System.out.println("Student not found!");
-        } else {
-            System.out.println("Roll No: " + temp.rollNo + ", Name: " + temp.name + ", Marks: " + temp.marks);
-        }
-    }
-
-    // Display records
-    void displayRecords() {
-        if (head == null) {
-            System.out.println("No records found!");
-            return;
-        }
-        Student temp = head;
-        System.out.println("Student Records:");
-        while (temp != null) {
-            System.out.println("Roll No: " + temp.rollNo + ", Name: " + temp.name + ", Marks: " + temp.marks);
-            temp = temp.next;
-        }
-    }
-
-    // Sort by Marks or RollNo (ascending or descending)
-    void sortRecords(String criteria, boolean ascending) {
-        if (head == null || head.next == null) return;
-
-        boolean swapped;
-        do {
-            swapped = false;
-            Student temp = head;
-            while (temp.next != null) {
-                boolean condition = false;
-                if (criteria.equalsIgnoreCase("marks")) {
-                    condition = ascending ? (temp.marks > temp.next.marks) : (temp.marks < temp.next.marks);
-                } else if (criteria.equalsIgnoreCase("rollno")) {
-                    condition = ascending ? (temp.rollNo > temp.next.rollNo) : (temp.rollNo < temp.next.rollNo);
-                }
-
-                if (condition) {
-                    // Swap data
-                    int r = temp.rollNo;
-                    String n = temp.name;
-                    float m = temp.marks;
-
-                    temp.rollNo = temp.next.rollNo;
-                    temp.name = temp.next.name;
-                    temp.marks = temp.next.marks;
-
-                    temp.next.rollNo = r;
-                    temp.next.name = n;
-                    temp.next.marks = m;
-
-                    swapped = true;
-                }
-                temp = temp.next;
-            }
-        } while (swapped);
-        System.out.println("Records sorted successfully!");
-    }
-}
-
-public class StudentRecordSystem {
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        StudentManagement sm = new StudentManagement();
-        int choice;
-
-        do {
-            System.out.println("\n---- Student Record Management ----");
-            System.out.println("1. Add Student");
-            System.out.println("2. Delete Student");
-            System.out.println("3. Update Student");
-            System.out.println("4. Search Student");
-            System.out.println("5. Display All Records");
-            System.out.println("6. Sort Records");
-            System.out.println("0. Exit");
-            System.out.print("Enter your choice: ");
-            choice = sc.nextInt();
-
-            switch (choice) {
-                case 1:
-                    System.out.print("Enter Roll No: ");
-                    int r = sc.nextInt();
-                    sc.nextLine(); // consume newline
-                    System.out.print("Enter Name: ");
-                    String n = sc.nextLine();
-                    System.out.print("Enter Marks: ");
-                    float m = sc.nextFloat();
-                    sm.addStudent(r, n, m);
-                    break;
-                case 2:
-                    System.out.print("Enter Roll No to delete: ");
-                    sm.deleteStudent(sc.nextInt());
-                    break;
-                case 3:
-                    System.out.print("Enter Roll No to update: ");
-                    int ru = sc.nextInt();
-                    sc.nextLine();
-                    System.out.print("Enter new Name: ");
-                    String nu = sc.nextLine();
-                    System.out.print("Enter new Marks: ");
-                    float mu = sc.nextFloat();
-                    sm.updateStudent(ru, nu, mu);
-                    break;
-                case 4:
-                    System.out.print("Enter Roll No to search: ");
-                    sm.searchStudent(sc.nextInt());
-                    break;
-                case 5:
-                    sm.displayRecords();
-                    break;
-                case 6:
-                    System.out.print("Sort by (rollno/marks): ");
-                    sc.nextLine();
-                    String crit = sc.nextLine();
-                    System.out.print("Ascending? (true/false): ");
-                    boolean asc = sc.nextBoolean();
-                    sm.sortRecords(crit, asc);
-                    break;
-                case 0:
-                    System.out.println("Exiting...");
-                    break;
-                default:
-                    System.out.println("Invalid choice!");
-            }
-        } while (choice != 0);
-
-        sc.close();
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
-import java.util.Scanner;
-
-class City {
-    String name;
-    int population;
-    City left, right;
-
-    City(String name, int population) {
-        this.name = name;
-        this.population = population;
-        this.left = this.right = null;
-    }
-}
-
-class CityBST {
-    City root;
-
-    // Add new city
-    City addCity(City node, String name, int population) {
-        if (node == null) {
-            System.out.println("City added successfully!");
-            return new City(name, population);
-        }
-        if (name.compareToIgnoreCase(node.name) < 0) {
-            node.left = addCity(node.left, name, population);
-        } else if (name.compareToIgnoreCase(node.name) > 0) {
-            node.right = addCity(node.right, name, population);
-        } else {
-            System.out.println("City already exists!");
-        }
-        return node;
-    }
-
-    // Find minimum node (used in delete)
-    City minValueNode(City node) {
-        City current = node;
-        while (current.left != null)
-            current = current.left;
-        return current;
-    }
-
-    // Delete a city
-    City deleteCity(City node, String name) {
-        if (node == null) {
-            System.out.println("City not found!");
-            return null;
-        }
-
-        if (name.compareToIgnoreCase(node.name) < 0)
-            node.left = deleteCity(node.left, name);
-        else if (name.compareToIgnoreCase(node.name) > 0)
-            node.right = deleteCity(node.right, name);
-        else {
-            // Node with only one child or no child
-            if (node.left == null) return node.right;
-            else if (node.right == null) return node.left;
-
-            // Node with two children: get inorder successor
-            City temp = minValueNode(node.right);
-            node.name = temp.name;
-            node.population = temp.population;
-            node.right = deleteCity(node.right, temp.name);
-        }
-        System.out.println("City deleted successfully!");
-        return node;
-    }
-
-    // Update population
-    void updatePopulation(City node, String name, int newPop) {
-        if (node == null) {
-            System.out.println("City not found!");
-            return;
-        }
-        if (name.equalsIgnoreCase(node.name)) {
-            node.population = newPop;
-            System.out.println("Population updated successfully!");
-        } else if (name.compareToIgnoreCase(node.name) < 0) {
-            updatePopulation(node.left, name, newPop);
-        } else {
-            updatePopulation(node.right, name, newPop);
-        }
-    }
-
-    // Display cities in ascending order (Inorder traversal)
-    void displayAscending(City node) {
-        if (node != null) {
-            displayAscending(node.left);
-            System.out.println("City: " + node.name + ", Population: " + node.population);
-            displayAscending(node.right);
-        }
-    }
-
-    // Display cities in descending order (Reverse inorder traversal)
-    void displayDescending(City node) {
-        if (node != null) {
-            displayDescending(node.right);
-            System.out.println("City: " + node.name + ", Population: " + node.population);
-            displayDescending(node.left);
-        }
-    }
-
-    // Find maximum comparisons required to search for a city
-    int maxComparisons(String name) {
-        City temp = root;
-        int count = 0;
-        while (temp != null) {
-            count++;
-            if (name.equalsIgnoreCase(temp.name))
-                return count; // found
-            else if (name.compareToIgnoreCase(temp.name) < 0)
-                temp = temp.left;
-            else
-                temp = temp.right;
-        }
-        return count; // not found, comparisons done
-    }
-}
-
-public class CityManagementSystem {
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        CityBST bst = new CityBST();
-        int choice;
-
-        do {
-            System.out.println("\n--- City Management System ---");
-            System.out.println("1. Add City");
-            System.out.println("2. Delete City");
-            System.out.println("3. Update Population");
-            System.out.println("4. Display Cities Ascending");
-            System.out.println("5. Display Cities Descending");
-            System.out.println("6. Search City (Max Comparisons)");
-            System.out.println("0. Exit");
-            System.out.print("Enter your choice: ");
-            choice = sc.nextInt();
-            sc.nextLine(); // consume newline
-
-            switch (choice) {
-                case 1:
-                    System.out.print("Enter City Name: ");
-                    String name = sc.nextLine();
-                    System.out.print("Enter Population: ");
-                    int pop = sc.nextInt();
-                    bst.root = bst.addCity(bst.root, name, pop);
-                    break;
-                case 2:
-                    System.out.print("Enter City Name to delete: ");
-                    String delName = sc.nextLine();
-                    bst.root = bst.deleteCity(bst.root, delName);
-                    break;
-                case 3:
-                    System.out.print("Enter City Name to update: ");
-                    String upName = sc.nextLine();
-                    System.out.print("Enter New Population: ");
-                    int newPop = sc.nextInt();
-                    bst.updatePopulation(bst.root, upName, newPop);
-                    break;
-                case 4:
-                    System.out.println("Cities in Ascending Order:");
-                    bst.displayAscending(bst.root);
-                    break;
-                case 5:
-                    System.out.println("Cities in Descending Order:");
-                    bst.displayDescending(bst.root);
-                    break;
-                case 6:
-                    System.out.print("Enter City Name to search: ");
-                    String searchName = sc.nextLine();
-                    int comps = bst.maxComparisons(searchName);
-                    System.out.println("Maximum comparisons required: " + comps);
-                    break;
-                case 0:
-                    System.out.println("Exiting...");
-                    break;
-                default:
-                    System.out.println("Invalid choice!");
-            }
-        } while (choice != 0);
-
-        sc.close();
-    }
-}
-
-
- 
