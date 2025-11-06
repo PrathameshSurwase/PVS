@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <pre><code>
+
+
+class CityBST {
+
+    static class Node {
+        String cityName;
+        int population;
+        Node left, right;
+
+        Node(String cityName, int population) {
+            this.cityName = cityName;
+            this.population = population;
+        }
+    }
+
+    static class BST {
+        Node root;
+
+        // Add a new city
+        void addCity(String cityName, int population) {
+            root = insert(root, cityName, population);
+        }
+
+        private Node insert(Node node, String cityName, int population) {
+            if (node == null) return new Node(cityName, population);
+            if (cityName.compareTo(node.cityName) < 0)
+                node.left = insert(node.left, cityName, population);
+            else if (cityName.compareTo(node.cityName) > 0)
+                node.right = insert(node.right, cityName, population);
+            else
+                System.out.println("City already exists.");
+            return node;
+        }
+
+        // Delete a city
+        void deleteCity(String cityName) {
+            root = delete(root, cityName);
+        }
+
+        private Node delete(Node node, String cityName) {
+            if (node == null) return null;
+            if (cityName.compareTo(node.cityName) < 0)
+                node.left = delete(node.left, cityName);
+            else if (cityName.compareTo(node.cityName) > 0)
+                node.right = delete(node.right, cityName);
+            else {
+                if (node.left == null) return node.right;
+                if (node.right == null) return node.left;
+                Node successor = findMin(node.right);
+                node.cityName = successor.cityName;
+                node.population = successor.population;
+                node.right = delete(node.right, successor.cityName);
+            }
+            return node;
+        }
+
+        private Node findMin(Node node) {
+            while (node.left != null) node = node.left;
+            return node;
+        }
+
+        // Update population
+        void updatePopulation(String cityName, int newPopulation) {
+            Node node = search(root, cityName);
+            if (node != null) {
+                node.population = newPopulation;
+                System.out.println("Population updated for " + cityName);
+            } else {
+                System.out.println("City not found.");
+            }
+        }
+
+        private Node search(Node node, String cityName) {
+            if (node == null) return null;
+            if (cityName.equals(node.cityName)) return node;
+            if (cityName.compareTo(node.cityName) < 0)
+                return search(node.left, cityName);
+            else
+                return search(node.right, cityName);
+        }
+
+        // Search city and count comparisons
+        int searchCity(String cityName) {
+            return searchComparisons(root, cityName, 0);
+        }
+
+        private int searchComparisons(Node node, String cityName, int comparisons) {
+            if (node == null) return comparisons;
+            comparisons++;
+            if (cityName.equals(node.cityName)) return comparisons;
+            if (cityName.compareTo(node.cityName) < 0)
+                return searchComparisons(node.left, cityName, comparisons);
+            else
+                return searchComparisons(node.right, cityName, comparisons);
+        }
+
+        // Display cities in ascending order
+        void displayAscending() {
+            if (root == null) {
+                System.out.println("No cities to display.");
+                return;
+            }
+            System.out.println("Cities in Ascending Order:");
+            inorder(root);
+        }
+
+        private void inorder(Node node) {
+            if (node != null) {
+                inorder(node.left);
+                System.out.println(node.cityName + " - Population: " + node.population);
+                inorder(node.right);
+            }
+        }
+
+        // Display cities in descending order
+        void displayDescending() {
+            if (root == null) {
+                System.out.println("No cities to display.");
+                return;
+            }
+            System.out.println("Cities in Descending Order:");
+            reverseInorder(root);
+        }
+
+        private void reverseInorder(Node node) {
+            if (node != null) {
+                reverseInorder(node.right);
+                System.out.println(node.cityName + " - Population: " + node.population);
+                reverseInorder(node.left);
+            }
+        }
+
+        // Maximum comparisons (height of tree)
+        int maxComparisons() {
+            return height(root);
+        }
+
+        private int height(Node node) {
+            if (node == null) return 0;
+            return 1 + Math.max(height(node.left), height(node.right));
+        }
+    }
+
+    public static void main(String[] args) {
+        BST tree = new BST();
+
+        tree.addCity("Mumbai", 20411000);
+        tree.addCity("Delhi", 16787941);
+        tree.addCity("Bangalore", 8443675);
+        tree.addCity("Chennai", 7088000);
+        tree.addCity("Hyderabad", 6809970);
+
+        tree.displayAscending();
+        tree.displayDescending();
+
+        tree.updatePopulation("Delhi", 18000000);
+        tree.deleteCity("Chennai");
+
+        System.out.println("Comparisons to find 'Hyderabad': " + tree.searchCity("Hyderabad"));
+        System.out.println("Maximum comparisons in worst case: " + tree.maxComparisons());
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+import java.util.Scanner;
+
+class StudentRecordSystem {
+
+    static class Student {
+        int rollNo;
+        String name;
+        int marks;
+        Student prev, next;
+
+        Student(int rollNo, String name, int marks) {
+            this.rollNo = rollNo;
+            this.name = name;
+            this.marks = marks;
+        }
+    }
+
+    static class DoublyLinkedList {
+        Student head, tail;
+
+        // Add student
+        void addStudent(int rollNo, String name, int marks) {
+            Student newStudent = new Student(rollNo, name, marks);
+            if (head == null) {
+                head = tail = newStudent;
+            } else {
+                tail.next = newStudent;
+                newStudent.prev = tail;
+                tail = newStudent;
+            }
+            System.out.println("Student added.");
+        }
+
+        // Delete student by roll number
+        void deleteStudent(int rollNo) {
+            Student current = head;
+            while (current != null) {
+                if (current.rollNo == rollNo) {
+                    if (current == head) head = current.next;
+                    if (current == tail) tail = current.prev;
+                    if (current.prev != null) current.prev.next = current.next;
+                    if (current.next != null) current.next.prev = current.prev;
+                    System.out.println("Student deleted.");
+                    return;
+                }
+                current = current.next;
+            }
+            System.out.println("Student not found.");
+        }
+
+        // Update student marks
+        void updateMarks(int rollNo, int newMarks) {
+            Student current = head;
+            while (current != null) {
+                if (current.rollNo == rollNo) {
+                    current.marks = newMarks;
+                    System.out.println("Marks updated.");
+                    return;
+                }
+                current = current.next;
+            }
+            System.out.println("Student not found.");
+        }
+
+        // Search student
+        void searchStudent(int rollNo) {
+            Student current = head;
+            while (current != null) {
+                if (current.rollNo == rollNo) {
+                    System.out.println("Found: RollNo=" + current.rollNo + ", Name=" + current.name + ", Marks=" + current.marks);
+                    return;
+                }
+                current = current.next;
+            }
+            System.out.println("Student not found.");
+        }
+
+        // Sort by roll number or marks
+        void sortRecords(String criteria, boolean ascending) {
+            if (head == null || head.next == null) return;
+
+            for (Student i = head; i != null; i = i.next) {
+                for (Student j = i.next; j != null; j = j.next) {
+                    boolean condition = false;
+                    if (criteria.equals("roll")) {
+                        condition = ascending ? i.rollNo > j.rollNo : i.rollNo < j.rollNo;
+                    } else if (criteria.equals("marks")) {
+                        condition = ascending ? i.marks > j.marks : i.marks < j.marks;
+                    }
+
+                    if (condition) {
+                        // Swap data
+                        int tempRoll = i.rollNo;
+                        String tempName = i.name;
+                        int tempMarks = i.marks;
+
+                        i.rollNo = j.rollNo;
+                        i.name = j.name;
+                        i.marks = j.marks;
+
+                        j.rollNo = tempRoll;
+                        j.name = tempName;
+                        j.marks = tempMarks;
+                    }
+                }
+            }
+            System.out.println("Records sorted by " + criteria + " in " + (ascending ? "ascending" : "descending") + " order.");
+        }
+
+        // Display records
+        void displayRecords() {
+            if (head == null) {
+                System.out.println("No records to display.");
+                return;
+            }
+            Student current = head;
+            System.out.println("Student Records:");
+            while (current != null) {
+                System.out.println("RollNo: " + current.rollNo + ", Name: " + current.name + ", Marks: " + current.marks);
+                current = current.next;
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        DoublyLinkedList list = new DoublyLinkedList();
+        Scanner sc = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("\n1.Add 2.Delete 3.Update 4.Search 5.Sort 6.Display 7.Exit");
+            int choice = sc.nextInt();
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter RollNo, Name, Marks: ");
+                    int r = sc.nextInt();
+                    String n = sc.next();
+                    int m = sc.nextInt();
+                    list.addStudent(r, n, m);
+                    break;
+                case 2:
+                    System.out.print("Enter RollNo to delete: ");
+                    list.deleteStudent(sc.nextInt());
+                    break;
+                case 3:
+                    System.out.print("Enter RollNo and new Marks: ");
+                    list.updateMarks(sc.nextInt(), sc.nextInt());
+                    break;
+                case 4:
+                    System.out.print("Enter RollNo to search: ");
+                    list.searchStudent(sc.nextInt());
+                    break;
+                case 5:
+                    System.out.print("Sort by 'roll' or 'marks'? ");
+                    String crit = sc.next();
+                    System.out.print("Ascending (true) or Descending (false)? ");
+                    boolean asc = sc.nextBoolean();
+                    list.sortRecords(crit, asc);
+                    break;
+                case 6:
+                    list.displayRecords();
+                    break;
+                case 7:
+                    System.out.println("Exiting...");
+                    return;
+            }
+        }
+    }
+}
+
+
+
+
+
+import java.util.*;
+
+public class pizza {
+
+    static class Graph {
+        int V;
+        int[][] adjMatrix;
+
+        Graph(int V) {
+            this.V = V;
+            adjMatrix = new int[V][V];
+            for (int i = 0; i < V; i++)
+                Arrays.fill(adjMatrix[i], Integer.MAX_VALUE);
+        }
+
+        void addEdge(int u, int v, int time) {
+            adjMatrix[u][v] = time;
+            adjMatrix[v][u] = time; // undirected
+        }
+    }
+
+    static class TSP {
+        int minTime = Integer.MAX_VALUE;
+        List<Integer> bestRoute = new ArrayList<>();
+
+        void tspUtil(Graph g, int current, boolean[] visited, List<Integer> route, int timeSoFar, int start) {
+            if (route.size() == g.V) {
+                if (g.adjMatrix[current][start] != Integer.MAX_VALUE) {
+                    int totalTime = timeSoFar + g.adjMatrix[current][start];
+                    if (totalTime < minTime) {
+                        minTime = totalTime;
+                        bestRoute = new ArrayList<>(route);
+                        bestRoute.add(start); // return to start
+                    }
+                }
+                return;
+            }
+
+            for (int i = 0; i < g.V; i++) {
+                if (!visited[i] && g.adjMatrix[current][i] != Integer.MAX_VALUE) {
+                    visited[i] = true;
+                    route.add(i);
+                    tspUtil(g, i, visited, route, timeSoFar + g.adjMatrix[current][i], start);
+                    visited[i] = false;
+                    route.remove(route.size() - 1);
+                }
+            }
+        }
+
+        void findOptimalRoute(Graph g, int start) {
+            boolean[] visited = new boolean[g.V];
+            visited[start] = true;
+            List<Integer> route = new ArrayList<>();
+            route.add(start);
+            tspUtil(g, start, visited, route, 0, start);
+
+            System.out.print("Optimal delivery route: ");
+            for (int loc : bestRoute)
+                System.out.print(loc + " -> ");
+            System.out.println("END");
+            System.out.println("Minimum delivery time: " + minTime + " minutes");
+        }
+    }
+
+    public static void main(String[] args) {
+        Graph g = new Graph(5);
+        g.addEdge(0, 1, 10);
+        g.addEdge(0, 2, 15);
+        g.addEdge(0, 3, 20);
+        g.addEdge(1, 2, 35);
+        g.addEdge(1, 3, 25);
+        g.addEdge(2, 3, 30);
+        g.addEdge(1, 4, 30);
+        g.addEdge(3, 4, 15);
+
+        int startLocation = 0;
+        TSP tspSolver = new TSP();
+        tspSolver.findOptimalRoute(g, startLocation);
+    }
+}
+
+
+
+
+
+
+
+
+
+from collections import defaultdict, Counter
+
+# Sample data
+# Dictionary: member_id -> list of borrowed book_ids
+borrow_records = {
+    'M001': ['B101', 'B102', 'B103'],
+    'M002': [],
+    'M003': ['B101', 'B104'],
+    'M004': ['B105'],
+    'M005': [],
+    'M006': ['B101', 'B105', 'B105'],
+}
+
+# Step 1: Compute average number of books borrowed by all members
+def compute_average_borrowed(records):
+    total_books = sum(len(books) for books in records.values())
+    total_members = len(records)
+    average = total_books / total_members if total_members else 0
+    return round(average, 2)
+
+# Step 2: Find book with highest and lowest number of borrowings
+def find_highest_lowest_borrowed(records):
+    book_counter = Counter()
+    for books in records.values():
+        book_counter.update(books)
+    if not book_counter:
+        return None, None
+    most_borrowed = book_counter.most_common(1)[0]
+    least_borrowed = min(book_counter.items(), key=lambda x: x[1])
+    return most_borrowed, least_borrowed
+
+# Step 3: Count members who haven't borrowed any books
+def count_non_borrowers(records):
+    return sum(1 for books in records.values() if len(books) == 0)
+
+# Step 4: Display the most frequently borrowed book (mode)
+def display_mode_book(records):
+    book_counter = Counter()
+    for books in records.values():
+        book_counter.update(books)
+    if not book_counter:
+        return None
+    mode_books = book_counter.most_common()
+    max_count = mode_books[0][1]
+    modes = [book for book, count in mode_books if count == max_count]
+    return modes
+
+# Run all functionalities
+print("📊 Library Borrowing Statistics")
+print("--------------------------------")
+print(f"Average books borrowed per member: {compute_average_borrowed(borrow_records)}")
+
+most, least = find_highest_lowest_borrowed(borrow_records)
+if most and least:
+    print(f"Most borrowed book: {most[0]} ({most[1]} times)")
+    print(f"Least borrowed book: {least[0]} ({least[1]} times)")
+else:
+    print("No borrowing data available.")
+
+print(f"Number of members who borrowed no books: {count_non_borrowers(borrow_records)}")
+
+mode_books = display_mode_book(borrow_records)
+if mode_books:
+    print(f"Most frequently borrowed book(s): {', '.join(mode_books)}")
+else:
+    print("No borrowing data to determine mode.")
+
+
+
+
+
+
+
+import java.util.Arrays;
+import java.util.Scanner;
+
+public class CustomerSearch {
+
+    // Linear Search
+    public static boolean linearSearch(int[] ids, int target) {
+        for (int id : ids) {
+            if (id == target) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Binary Search (requires sorted array)
+    public static boolean binarySearch(int[] ids, int target) {
+        Arrays.sort(ids); // Ensure array is sorted
+        int left = 0, right = ids.length - 1;
+
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            if (ids[mid] == target) {
+                return true;
+            } else if (ids[mid] < target) {
+                left = mid + 1;
+            } else {
+                right = mid - 1;
+            }
+        }
+        return false;
+    }
+
+    public static void main(String[] args) {
+        int[] customerIDs = {105, 203, 150, 312, 450, 275, 99, 120};
+
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter customer account ID to search: ");
+        int targetID = scanner.nextInt();
+
+        // Linear Search
+        if (linearSearch(customerIDs, targetID)) {
+            System.out.println("✅ Found using Linear Search.");
+        } else {
+            System.out.println("❌ Not found using Linear Search.");
+        }
+
+        // Binary Search
+        if (binarySearch(customerIDs, targetID)) {
+            System.out.println("✅ Found using Binary Search.");
+        } else {
+            System.out.println("❌ Not found using Binary Search.");
+        }
+
+        scanner.close();
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+import java.util.Arrays;
+
+public class SalarySorter {
+
+    // Selection Sort
+    public static void selectionSort(double[] salaries) {
+        int n = salaries.length;
+        for (int i = 0; i < n - 1; i++) {
+            int minIndex = i;
+            for (int j = i + 1; j < n; j++) {
+                if (salaries[j] < salaries[minIndex]) {
+                    minIndex = j;
+                }
+            }
+            double temp = salaries[i];
+            salaries[i] = salaries[minIndex];
+            salaries[minIndex] = temp;
+        }
+    }
+
+    // Bubble Sort
+    public static void bubbleSort(double[] salaries) {
+        int n = salaries.length;
+        for (int i = 0; i < n - 1; i++) {
+            for (int j = 0; j < n - i - 1; j++) {
+                if (salaries[j] > salaries[j + 1]) {
+                    double temp = salaries[j];
+                    salaries[j] = salaries[j + 1];
+                    salaries[j + 1] = temp;
+                }
+            }
+        }
+    }
+
+    // Display array
+    public static void display(String message, double[] arr) {
+        System.out.println(message);
+        for (double val : arr) {
+            System.out.print(val + " ");
+        }
+        System.out.println("\n");
+    }
+
+    public static void main(String[] args) {
+        double[] employeeSalaries = {45000.50, 32000.75, 58000.00, 29000.25, 67000.90, 41000.00};
+
+        double[] selectionSorted = Arrays.copyOf(employeeSalaries, employeeSalaries.length);
+        double[] bubbleSorted = Arrays.copyOf(employeeSalaries, employeeSalaries.length);
+
+        selectionSort(selectionSorted);
+        bubbleSort(bubbleSorted);
+
+        display("📊 Salaries sorted using Selection Sort:", selectionSorted);
+        display("📊 Salaries sorted using Bubble Sort:", bubbleSorted);
+    }
+}
+
+
+
+
+
+
+
+import java.util.Scanner;
+import java.util.Stack;
+
+public class TextEditor {
+
+    static class Editor {
+        private StringBuilder document;
+        private Stack<String> undoStack;
+        private Stack<String> redoStack;
+
+        public Editor() {
+            document = new StringBuilder();
+            undoStack = new Stack<>();
+            redoStack = new Stack<>();
+        }
+
+        // Make a new change
+        public void makeChange(String newText) {
+            undoStack.push(document.toString()); // Save current state
+            document.append(newText);           // Apply new change
+            redoStack.clear();                  // Clear redo history
+        }
+
+        // Undo the last change
+        public void undo() {
+            if (!undoStack.isEmpty()) {
+                redoStack.push(document.toString()); // Save current state for redo
+                document = new StringBuilder(undoStack.pop()); // Revert to previous state
+            } else {
+                System.out.println("⚠️ Nothing to undo.");
+            }
+        }
+
+        // Redo the last undone change
+        public void redo() {
+            if (!redoStack.isEmpty()) {
+                undoStack.push(document.toString()); // Save current state for undo
+                document = new StringBuilder(redoStack.pop()); // Reapply last undone change
+            } else {
+                System.out.println("⚠️ Nothing to redo.");
+            }
+        }
+
+        // Display current document state
+        public void display() {
+            System.out.println("📄 Current Document: \"" + document.toString() + "\"");
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        Editor editor = new Editor();
+        int choice;
+
+        do {
+            System.out.println("\n--- Text Editor ---");
+            System.out.println("1. Make a Change");
+            System.out.println("2. Undo");
+            System.out.println("3. Redo");
+            System.out.println("4. Display Document");
+            System.out.println("5. Exit");
+            System.out.print("Choose an option: ");
+            choice = scanner.nextInt();
+            scanner.nextLine(); // consume newline
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter text to append: ");
+                    String text = scanner.nextLine();
+                    editor.makeChange(text);
+                    break;
+                case 2:
+                    editor.undo();
+                    break;
+                case 3:
+                    editor.redo();
+                    break;
+                case 4:
+                    editor.display();
+                    break;
+                case 5:
+                    System.out.println("Exiting editor...");
+                    break;
+                default:
+                    System.out.println("Invalid choice. Try again.");
+            }
+
+        } while (choice != 5);
+
+        scanner.close();
+    }
+}
+
+
+
+
+
+
+
+
+
+import java.util.Scanner;
+import java.util.Stack;
+
+public class pizza {
+
+    static class Editor {
+        private StringBuilder document;
+        private Stack undoStack;
+        private Stack redoStack;
+
+        public Editor() {
+            document = new StringBuilder();
+            undoStack = new Stack<>();
+            redoStack = new Stack<>();
+        }
+
+        // Make a new change
+        public void makeChange(String newText) {
+            undoStack.push(document.toString()); // Save current state
+            document.append(newText);           // Apply new change
+            redoStack.clear();                  // Clear redo history
+        }
+
+        // Undo the last change
+        public void undo() {
+            if (!undoStack.isEmpty()) {
+                redoStack.push(document.toString()); // Save current state for redo
+                document = new StringBuilder(undoStack.pop().toString()); // Revert to previous state
+            } else {
+                System.out.println("⚠️ Nothing to undo.");
+            }
+        }
+
+        // Redo the last undone change
+        public void redo() {
+            if (!redoStack.isEmpty()) {
+                undoStack.push(document.toString()); // Save current state for undo
+                document = new StringBuilder(redoStack.pop().toString()); // Reapply last undone change
+            } else {
+                System.out.println("⚠️ Nothing to redo.");
+            }
+        }
+
+        // Display current document state
+        public void display() {
+            System.out.println("📄 Current Document: \"" + document.toString() + "\"");
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        Editor editor = new Editor();
+        int choice;
+
+        do {
+            System.out.println("\n--- Text Editor ---");
+            System.out.println("1. Make a Change");
+            System.out.println("2. Undo");
+            System.out.println("3. Redo");
+            System.out.println("4. Display Document");
+            System.out.println("5. Exit");
+            System.out.print("Choose an option: ");
+            choice = scanner.nextInt();
+            scanner.nextLine(); // consume newline
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter text to append: ");
+                    String text = scanner.nextLine();
+                    editor.makeChange(text);
+                    break;
+                case 2:
+                    editor.undo();
+                    break;
+                case 3:
+                    editor.redo();
+                    break;
+                case 4:
+                    editor.display();
+                    break;
+                case 5:
+                    System.out.println("Exiting editor...");
+                    break;
+                default:
+                    System.out.println("Invalid choice. Try again.");
+            }
+
+        } while (choice != 5);
+
+        scanner.close();
+    }
+}
+
+
+
+
+
+
+
+
+
+
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Scanner;
+
+public class CallCenter {
+
+    // Call class to store customerID and callTime
+    static class Call {
+        String customerID;
+        int callTime;
+
+        Call(String customerID, int callTime) {
+            this.customerID = customerID;
+            this.callTime = callTime;
+        }
+
+        @Override
+        public String toString() {
+            return "CustomerID: " + customerID + ", CallTime: " + callTime + " min";
+        }
+    }
+
+    // Call queue
+    static class CallQueue {
+        Queue<Call> queue = new LinkedList<>();
+
+        // Add a call to the queue
+        public void addCall(String customerID, int callTime) {
+            queue.offer(new Call(customerID, callTime));
+            System.out.println("📞 Call added for Customer " + customerID);
+        }
+
+        // Answer the next call
+        public void answerCall() {
+            if (!queue.isEmpty()) {
+                Call answered = queue.poll();
+                System.out.println("✅ Answered call: " + answered);
+            } else {
+                System.out.println("⚠️ No calls to answer.");
+            }
+        }
+
+        // View all pending calls
+        public void viewQueue() {
+            if (queue.isEmpty()) {
+                System.out.println("📭 No pending calls.");
+            } else {
+                System.out.println("📋 Pending Calls:");
+                for (Call call : queue) {
+                    System.out.println("- " + call);
+                }
+            }
+        }
+
+        // Check if queue is empty
+        public boolean isQueueEmpty() {
+            return queue.isEmpty();
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        CallQueue callCenter = new CallQueue();
+        int choice;
+
+        do {
+            System.out.println("\n--- Call Center Menu ---");
+            System.out.println("1. Add Call");
+            System.out.println("2. Answer Call");
+            System.out.println("3. View Queue");
+            System.out.println("4. Check if Queue is Empty");
+            System.out.println("5. Exit");
+            System.out.print("Choose an option: ");
+            choice = scanner.nextInt();
+            scanner.nextLine(); // consume newline
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter Customer ID: ");
+                    String id = scanner.nextLine();
+                    System.out.print("Enter Call Time (in minutes): ");
+                    int time = scanner.nextInt();
+                    scanner.nextLine();
+                    callCenter.addCall(id, time);
+                    break;
+                case 2:
+                    callCenter.answerCall();
+                    break;
+                case 3:
+                    callCenter.viewQueue();
+                    break;
+                case 4:
+                    System.out.println(callCenter.isQueueEmpty() ? "✅ Queue is empty." : "❌ Queue is not empty.");
+                    break;
+                case 5:
+                    System.out.println("Exiting Call Center...");
+                    break;
+                default:
+                    System.out.println("Invalid choice. Try again.");
+            }
+
+        } while (choice != 5);
+
+        scanner.close();
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import java.util.LinkedList;
+
+public class HashTable {
+
+    // Entry class to store key-value pairs
+    static class Entry {
+        int key;
+        String value;
+
+        Entry(int key, String value) {
+            this.key = key;
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return "(" + key + ", " + value + ")";
+        }
+    }
+
+    // Hash table with chaining
+    static class HashTableWithChaining {
+        private final int SIZE = 10;
+        private LinkedList<Entry>[] table;
+
+        @SuppressWarnings("unchecked")
+        public HashTableWithChaining() {
+            table = new LinkedList[SIZE];
+            for (int i = 0; i < SIZE; i++) {
+                table[i] = new LinkedList<>();
+            }
+        }
+
+        // Division method hash function
+        private int hash(int key) {
+            return key % SIZE;
+        }
+
+        // Insert key-value pair
+        public void insert(int key, String value) {
+            int index = hash(key);
+            for (Entry entry : table[index]) {
+                if (entry.key == key) {
+                    entry.value = value; // Update if key exists
+                    return;
+                }
+            }
+            table[index].add(new Entry(key, value));
+            System.out.println("✅ Inserted: " + key + " → " + value);
+        }
+
+        // Search for a key
+        public String search(int key) {
+            int index = hash(key);
+            for (Entry entry : table[index]) {
+                if (entry.key == key) {
+                    return entry.value;
+                }
+            }
+            return null;
+        }
+
+        // Delete a key
+        public void delete(int key) {
+            int index = hash(key);
+            for (Entry entry : table[index]) {
+                if (entry.key == key) {
+                    table[index].remove(entry);
+                    System.out.println("❌ Deleted key: " + key);
+                    return;
+                }
+            }
+            System.out.println("⚠️ Key not found: " + key);
+        }
+
+        // Display entire table
+        public void display() {
+            System.out.println("\n📦 Hash Table Contents:");
+            for (int i = 0; i < SIZE; i++) {
+                System.out.print("Bucket " + i + ": ");
+                for (Entry entry : table[i]) {
+                    System.out.print(entry + " ");
+                }
+                System.out.println();
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        HashTableWithChaining ht = new HashTableWithChaining();
+
+        ht.insert(15, "Alice");
+        ht.insert(25, "Bob");
+        ht.insert(35, "Charlie");
+        ht.insert(5, "David");
+
+        ht.display();
+
+        System.out.println("\n🔍 Search key 25: " + ht.search(25));
+        System.out.println("🔍 Search key 99: " + ht.search(99));
+
+        ht.delete(25);
+        ht.delete(99);
+
+        ht.display();
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+import java.util.Scanner;
+
+public class LinearProbingHashTable {
+
+    static class HashTable {
+        private final int SIZE = 10;
+        private Integer[] table;
+        private final Integer DELETED = Integer.MIN_VALUE;
+
+        public HashTable() {
+            table = new Integer[SIZE];
+        }
+
+        // Hash function using division method
+        private int hash(int key) {
+            return key % SIZE;
+        }
+
+        // Insert key using linear probing
+        public void insert(int key) {
+            int index = hash(key);
+            int startIndex = index;
+
+            do {
+                if (table[index] == null || table[index] == DELETED) {
+                    table[index] = key;
+                    System.out.println("✅ Inserted key: " + key);
+                    return;
+                }
+                index = (index + 1) % SIZE;
+            } while (index != startIndex);
+
+            System.out.println("⚠️ Hash table is full. Cannot insert key: " + key);
+        }
+
+        // Search for a key
+        public boolean search(int key) {
+            int index = hash(key);
+            int startIndex = index;
+
+            do {
+                if (table[index] == null) return false;
+                if (table[index] != DELETED && table[index] == key) return true;
+                index = (index + 1) % SIZE;
+            } while (index != startIndex);
+
+            return false;
+        }
+
+        // Delete a key
+        public void delete(int key) {
+            int index = hash(key);
+            int startIndex = index;
+
+            do {
+                if (table[index] == null) break;
+                if (table[index] != DELETED && table[index] == key) {
+                    table[index] = DELETED;
+                    System.out.println("❌ Deleted key: " + key);
+                    return;
+                }
+                index = (index + 1) % SIZE;
+            } while (index != startIndex);
+
+            System.out.println("⚠️ Key not found: " + key);
+        }
+
+        // Display the hash table
+        public void display() {
+            System.out.println("\n📦 Hash Table Contents:");
+            for (int i = 0; i < SIZE; i++) {
+                if (table[i] == null) {
+                    System.out.println("Index " + i + ": [Empty]");
+                } else if (table[i] == DELETED) {
+                    System.out.println("Index " + i + ": [Deleted]");
+                } else {
+                    System.out.println("Index " + i + ": " + table[i]);
+                }
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        HashTable ht = new HashTable();
+        int choice;
+
+        do {
+            System.out.println("\n--- Hash Table Menu ---");
+            System.out.println("1. Insert a key");
+            System.out.println("2. Search for a key");
+            System.out.println("3. Delete a key");
+            System.out.println("4. Display the table");
+            System.out.println("5. Exit");
+            System.out.print("Choose an option: ");
+            choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter key to insert: ");
+                    int insertKey = scanner.nextInt();
+                    ht.insert(insertKey);
+                    break;
+                case 2:
+                    System.out.print("Enter key to search: ");
+                    int searchKey = scanner.nextInt();
+                    System.out.println(ht.search(searchKey) ? "🔍 Key found." : "🔍 Key not found.");
+                    break;
+                case 3:
+                    System.out.print("Enter key to delete: ");
+                    int deleteKey = scanner.nextInt();
+                    ht.delete(deleteKey);
+                    break;
+                case 4:
+                    ht.display();
+                    break;
+                case 5:
+                    System.out.println("Exiting...");
+                    break;
+                default:
+                    System.out.println("Invalid choice. Try again.");
+            }
+
+        } while (choice != 5);
+
+        scanner.close();
+    }
+}
+
+
+
+
+
+
+
+ 
+
+    class Bucket:
+    def __init__(self, depth):
+        self.local_depth = depth
+        self.entries = {}
+
+    def is_full(self, threshold):
+        return len(self.entries) >= threshold
+
+
+class ExtendibleHashTable:
+    def __init__(self, bucket_size):
+        self.global_depth = 1
+        self.bucket_size = bucket_size
+        self.directory = [Bucket(self.global_depth) for _ in range(2)]
+
+    def hash(self, key):
+        return key & ((1 << self.global_depth) - 1)
+
+    def insert(self, key, value):
+        index = self.hash(key)
+        bucket = self.directory[index]
+
+        if not bucket.is_full(self.bucket_size):
+            bucket.entries[key] = value
+            print(f"✅ Inserted: {key} → {value}")
+        else:
+            print("⚠️ Bucket full. Splitting...")
+            self.split_bucket(index)
+            self.insert(key, value)  # Retry after split
+
+    def split_bucket(self, index):
+        old_bucket = self.directory[index]
+        old_bucket.local_depth += 1
+
+        if old_bucket.local_depth > self.global_depth:
+            self.double_directory()
+
+        new_bucket = Bucket(old_bucket.local_depth)
+        keys_to_rehash = list(old_bucket.entries.keys())
+
+        for i in range(len(self.directory)):
+            if self.directory[i] is old_bucket and ((i >> (old_bucket.local_depth - 1)) & 1):
+                self.directory[i] = new_bucket
+
+        for key in keys_to_rehash:
+            value = old_bucket.entries.pop(key)
+            self.insert(key, value)
+
+    def double_directory(self):
+        self.directory += self.directory.copy()
+        self.global_depth += 1
+        print(f"🔁 Directory doubled. New global depth: {self.global_depth}")
+
+    def search(self, key):
+        index = self.hash(key)
+        bucket = self.directory[index]
+        return bucket.entries.get(key)
+
+    def delete(self, key):
+        index = self.hash(key)
+        bucket = self.directory[index]
+        if key in bucket.entries:
+            del bucket.entries[key]
+            print(f"❌ Deleted key: {key}")
+        else:
+            print(f"⚠️ Key not found: {key}")
+
+    def display(self):
+        print("\n📦 Hash Table Contents:")
+        seen = set()
+        for bucket in self.directory:
+            if id(bucket) not in seen:
+                seen.add(id(bucket))
+                print(f"Bucket (depth {bucket.local_depth}): {bucket.entries}")
+
+
+# Demo
+if __name__ == "__main__":
+    ht = ExtendibleHashTable(bucket_size=2)
+
+    ht.insert(5, "Alice")
+    ht.insert(15, "Bob")
+    ht.insert(25, "Charlie")
+    ht.insert(35, "David")
+    ht.insert(45, "Eve")
+
+    ht.display()
+
+    print(f"\n🔍 Search key 25: {ht.search(25)}")
+    ht.delete(15)
+    ht.display()
+    </code></pre>
+</body>
+</html>
